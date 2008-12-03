@@ -3,7 +3,10 @@ use strict;
 use warnings( FATAL => 'all' );
 use Encode;
 
-our $VERSION = '2.0.0';
+use Exporter 'import';
+our  @EXPORT_OK = qw(detect);
+
+our $VERSION = '2.0.1';
 
 #===================================
 #===Author  : qian.yu            ===
@@ -13,6 +16,7 @@ our $VERSION = '2.0.0';
 #===Homepage: www.fishlib.cn     ===
 #===================================
 
+#===2.0.1(2008-12-03): add eval to avoid die
 #===2.0.0(2008-12-02): modify the name from CharsetDetector to Encode::Detect::CJK
 #===1.0.0(2005-08-28): first release
 
@@ -7901,6 +7905,8 @@ sub detect {
 	if ( !defined( $_[0] ) ) {
 		return '';
 	}
+my $ret;
+eval{
 	my $len     = length $_[0];
 	my $bin_ful = \$_[0];
 	my $bin     = ( defined( $_[1] ) and $len > $_[1] )? \substr( $_[0], 0, $_[1] ):\$_[0];
@@ -7909,21 +7915,29 @@ sub detect {
 	my $det1 = get_det1($bin);
 	
 	if(!$use_det2){
-		return filter_ascii( $_encoding_reverse->{$det1} );
+		$ret=filter_ascii( $_encoding_reverse->{$det1} );
 	}
 	
 	if ( in_safe_list($det1) ) {
-		return filter_ascii( $_encoding_reverse->{$det1} );
+		$ret=filter_ascii( $_encoding_reverse->{$det1} );
 	}
 	else {
 		my $det2 = get_det2($bin_ful);
 		if ( defined($det2) ) {
-			return filter_ascii($det2);
+			$ret=filter_ascii($det2);
 		}
 		else {
-			return filter_ascii( $_encoding_reverse->{$det1} );
+			$ret=filter_ascii( $_encoding_reverse->{$det1} );
 		}
 	}
+
+	};
+if($@){
+	undef $@;
+	return 'iso-8859-1';
+}else{
+	return $ret;
+}
 }
 
 sub get_det1 {
@@ -8639,8 +8653,9 @@ if you don't want detetor to consider html header as a factor, set $is_consider_
 
 if $octets is null return ''
 if $octets is '' return 'iso-8859-1'
+else return charset name
 
-=head1 supported charset list
+=head1 Supported Charset List
 
 	return value: alias
 	
