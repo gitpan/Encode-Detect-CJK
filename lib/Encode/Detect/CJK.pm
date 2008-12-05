@@ -6,7 +6,7 @@ use Encode;
 use Exporter 'import';
 our  @EXPORT_OK = qw(detect);
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.2';
 
 #===================================
 #===Author  : qian.yu            ===
@@ -16,7 +16,7 @@ our $VERSION = '2.0.1';
 #===Homepage: www.fishlib.cn     ===
 #===================================
 
-#===2.0.1(2008-12-03): add eval to avoid die
+#===2.0.2(2008-12-03): add eval to avoid die
 #===2.0.0(2008-12-02): modify the name from CharsetDetector to Encode::Detect::CJK
 #===1.0.0(2005-08-28): first release
 
